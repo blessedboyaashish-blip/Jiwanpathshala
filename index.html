@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.5">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Jiwan Pathshala - Generational Map&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- D3.js is essential here for computing and drawing hierarchical tree links --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.node circle { fill: #fff; stroke-width: 3px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.node text { font: 12px sans-serif; font-weight: 500; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.link { fill: none; stroke: #cbd5e1; stroke-width: 2px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body class="bg-gray-100 font-sans text-gray-800"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;nav class="bg-blue-950 text-white p-4 flex justify-between items-center shadow-md"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h1 class="text-xl font-bold"&gt;Jiwan Pathshala Generational Mapping&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="text-xs text-blue-300"&gt;Tracking Multiplication &amp; Lineage Data&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span id="sync-status" class="px-3 py-1 text-xs rounded-full bg-indigo-600 text-white"&gt;Local Demo Mode&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/nav&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-4"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Sidebar Controls &amp; Node Inspector --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="space-y-4 lg:col-span-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="font-bold text-gray-700 mb-2"&gt;Data Source Config&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;input id="sheet-url-input" type="text" placeholder="Paste Google Sheet CSV URL here..." class="w-full text-xs p-2 border rounded mb-2 focus:outline-blue-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="loadRemoteData()" class="w-full bg-blue-900 hover:bg-blue-800 text-white text-xs py-2 rounded font-medium transition-colors"&gt;Sync Live Sheet&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="font-bold text-gray-700 mb-2"&gt;Group Inspector&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="inspector-content" class="text-sm text-gray-500 italic"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>Click any node on the tree map to inspect group lineage and tracking metrics.</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Tree Canvas Display Area --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 lg:col-span-3 flex flex-col items-center justify-center min-h-[600px] relative"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2 class="absolute top-4 left-4 font-bold text-gray-700"&gt;Multiplication Lineage Tree&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="tree-container" class="w-full h-[550px] overflow-auto"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Placeholder link - overwrite with your published Google Sheet CSV URL</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let csvUrl = '';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Dynamic fallback dataset demonstrating the relational parent-child link strategy</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const sampleMovementData = [</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ GroupID: "M_ROOT", GroupName: "Central Team", ParentID: "Gen0", LeaderName: "Aashish", TotalAttendance: 12, Status: "Multiplying" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ GroupID: "G1_A", GroupName: "KTM Valley Fellowship", ParentID: "M_ROOT", LeaderName: "Arun", TotalAttendance: 22, Status: "Harvesting" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ GroupID: "G1_B", GroupName: "Pokhara Seed", ParentID: "M_ROOT", LeaderName: "Pramila", TotalAttendance: 15, Status: "Multiplying" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ GroupID: "G2_A1", GroupName: "Lalitpur Study", ParentID: "G1_A", LeaderName: "Subash", TotalAttendance: 8, Status: "Growing" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ GroupID: "G2_B1", GroupName: "Lekhnath Group", ParentID: "G1_B", LeaderName: "Barnabas", TotalAttendance: 19, Status: "Multiplying" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ GroupID: "G3_B1_1", GroupName: "Baglung Outreach", ParentID: "G2_B1", LeaderName: "Asther", TotalAttendance: 6, Status: "Seeding" }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.addEventListener('DOMContentLoaded', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderGenerationalTree(sampleMovementData);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function loadRemoteData() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const inputUrl = document.getElementById('sheet-url-input').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if(!inputUrl) return alert("Please specify a valid published CSV URL first.");</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('sync-status').innerText = "Syncing...";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Papa.parse(inputUrl, {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>download: true,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>header: true,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>dynamicTyping: true,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>skipEmptyLines: true,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>success: function(results) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if(results.data &amp;&amp; results.data.length &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>document.getElementById('sync-status').className = "px-3 py-1 text-xs rounded-full bg-emerald-600 text-white";</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>document.getElementById('sync-status').innerText = "Synced Live";</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderGenerationalTree(results.data);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                </span>error: function(err) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>alert("Parsing error: " + err.message);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>document.getElementById('sync-status').innerText = "Failed";</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function renderGenerationalTree(flatData) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Clear prior canvas elements cleanly before redraws</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('tree-container').innerHTML = '';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Convert raw flat tabular items into an organized parent-child dictionary for D3 usage</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const dataStratified = d3.stratify()</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.id(d =&gt; d.GroupID)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.parentId(d =&gt; d.ParentID === 'Gen0' ? null : d.ParentID)(flatData);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const margin = {top: 20, right: 90, bottom: 30, left: 90};</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const width = 700 - margin.left - margin.right;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const height = 500 - margin.top - margin.bottom;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const svg = d3.select("#tree-container").append("svg")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.attr("width", width + margin.left + margin.right)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.attr("height", height + margin.top + margin.bottom)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.append("g")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.attr("transform", "translate(" + margin.left + "," + margin.top + ")");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const treemap = d3.tree().size([height, width]);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let nodes = d3.hierarchy(dataStratified, d =&gt; d.children);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>nodes = treemap(nodes);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Add links joining generation layers together</p>
+<p class="p1"><span class="Apple-converted-space">                </span>svg.selectAll(".link")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.data(nodes.descendants().slice(1))</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.enter().append("path")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.attr("class", "link")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.attr("d", d =&gt; "M" + d.y + "," + d.x + "C" + (d.y + d.parent.y) / 2 + "," + d.x + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x + " " + d.parent.y + "," + d.parent.x);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Instantiation loop for individual node elements</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const node = svg.selectAll(".node")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.data(nodes.descendants())</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.enter().append("g")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.attr("class", d =&gt; "node" + (d.children ? " node--internal" : " node--leaf"))</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.attr("transform", d =&gt; "translate(" + d.y + "," + d.x + ")")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.on("click", (event, d) =&gt; populateInspector(d.data.data));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Color code node borders to match Four Fields framework lifecycle status values</p>
+<p class="p1"><span class="Apple-converted-space">                </span>node.append("circle")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.attr("r", 8)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.style("stroke", d =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const s = d.data.data.Status;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if(s === 'Multiplying') return '#a855f7'; // Purple</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if(s === 'Harvesting') return '#10b981'; // Emerald Green</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if(s === 'Growing') return '#3b82f6'; // Blue</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>return '#eab308'; // Amber Seeding status</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>node.append("text")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.attr("dy", ".35em")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.attr("x", d =&gt; d.children ? -13 : 13)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.style("text-anchor", d =&gt; d.children ? "end" : "start")</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.text(d =&gt; d.data.data.GroupName);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (treeError) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('tree-container').innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="text-red-500 text-sm p-4 border border-dashed border-red-300 rounded text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;strong&gt;Mapping Architecture Error:&lt;/strong&gt;&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>Could not build tree. Check that your &lt;code&gt;ParentID&lt;/code&gt; codes point precisely to existing &lt;code&gt;GroupID&lt;/code&gt; targets.</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error(treeError);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function populateInspector(group) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('inspector-content').innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="space-y-2 mt-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="text-lg font-bold text-blue-900"&gt;${group.GroupName}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;hr class="border-gray-100"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;&lt;span class="text-xs font-bold uppercase text-gray-400 block"&gt;Unique ID&lt;/span&gt; &lt;code class="bg-gray-100 px-1 py-0.5 rounded text-xs text-red-600"&gt;${group.GroupID}&lt;/code&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;&lt;span class="text-xs font-bold uppercase text-gray-400 block"&gt;Parent Root&lt;/span&gt; &lt;code class="bg-gray-100 px-1 py-0.5 rounded text-xs"&gt;${group.ParentID}&lt;/code&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;&lt;span class="text-xs font-bold uppercase text-gray-400 block"&gt;Field Facilitator&lt;/span&gt; &lt;span class="font-medium text-gray-800"&gt;${group.LeaderName}&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;&lt;span class="text-xs font-bold uppercase text-gray-400 block"&gt;Attendance Group Size&lt;/span&gt; &lt;span class="font-medium text-gray-800"&gt;${group.TotalAttendance} regular attendees&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;&lt;span class="text-xs font-bold uppercase text-gray-400 block"&gt;Four Fields Stage&lt;/span&gt; &lt;span class="inline-block mt-0.5 px-2 py-0.5 text-xs rounded font-semibold bg-gray-100 text-gray-700 border"&gt;${group.Status}&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
