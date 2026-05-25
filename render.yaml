@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: jiwan-pathshala-life-trends
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: PORT
+        value: "10000"
+      # The values below are NOT real secrets. Set real values in the Render
+      # dashboard (Environment tab) or via `render env set <KEY> <VALUE>`.
+      - key: PUBLIC_APP_TITLE
+        sync: false
+      - key: PUBLIC_SHEET_CSV_URL
+        sync: false
